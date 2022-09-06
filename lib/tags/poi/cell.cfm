@@ -254,18 +254,22 @@
 			<cfif (VARIABLES.RowTag.CellIndex GT ArrayLen( VARIABLES.DocumentTag.ColumnLookup ))>
 
 				<!--- Use MOD'ing on column lookup. --->
-				<cfset VARIABLES.DocumentTag.CellAliases[ "@#ATTRIBUTES.Alias#" ] = (
+				<cfset VARIABLES.aliasTarget = (
 					VARIABLES.DocumentTag.ColumnLookup[ Fix( VARIABLES.RowTag.CellIndex / ArrayLen( VARIABLES.DocumentTag.ColumnLookup ) ) ] &
 					VARIABLES.DocumentTag.ColumnLookup[ VARIABLES.RowTag.CellIndex MOD ArrayLen( VARIABLES.DocumentTag.ColumnLookup ) ] &
 					VARIABLES.SheetTag.RowIndex
-					) />
+				) />
 
 			<cfelse>
 
 				<!--- Store in single column lookup. --->
-				<cfset VARIABLES.DocumentTag.CellAliases[ "@#ATTRIBUTES.Alias#" ] = (VARIABLES.DocumentTag.ColumnLookup[ VARIABLES.RowTag.CellIndex ] & VARIABLES.SheetTag.RowIndex) />
+				<cfset VARIABLES.aliasTarget = (VARIABLES.DocumentTag.ColumnLookup[ VARIABLES.RowTag.CellIndex ] & VARIABLES.SheetTag.RowIndex) />
 
 			</cfif>
+			
+			<cfloop list="#ATTRIBUTES.Alias#" index="VARIABLES.aliasFromList" >
+				<cfset VARIABLES.DocumentTag.CellAliases[ "@#trim(VARIABLES.aliasFromList)#" ] = VARIABLES.aliasTarget />
+			</cfloop>
 
 		</cfif>
 
@@ -434,7 +438,7 @@
 							Reset the cell type so that the formula does not cause
 							any errors to be thrown.
 						--->
-						<cfset VARIABLES.Cell.SetCellType( VARIABLES.Cell.CELL_TYPE_STRING ) />
+						<cfset VARIABLES.Cell.SetCellType( VARIABLES.Cell.getCellTypeEnum().STRING ) />
 
 							<!--- Set string value. --->
 						<cfset VARIABLES.Cell.SetCellValue(

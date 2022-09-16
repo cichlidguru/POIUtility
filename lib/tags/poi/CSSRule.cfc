@@ -380,7 +380,7 @@ component accessors=true output=false  {
 
 			LOCAL.roundFormat = "_";
 			LOCAL.integerPart = Int( abs( ARGUMENTS.value ) );
-			LOCAL.numberOfDigits = Int( Log10( LOCAL.integerPart ) + 1 );
+			LOCAL.numberOfDigits = ( LOCAL.integerPart EQ 0 ? 1 : Int( Log10( LOCAL.integerPart ) + 1 ) );
 
 			if( abs( ARGUMENTS.value ) eq abs( LOCAL.integerPart ) ){
 				return ARGUMENTS.value;
@@ -399,8 +399,10 @@ component accessors=true output=false  {
 			LOCAL.result = NumberFormat( ARGUMENTS.value, LOCAL.roundDecimalFormat );
 
 			//Perform final check that rounding didn't make it bigger than 15 digits 999999999999999.99 etc., otherwise round without decimals
+			LOCAL.resultIntegerPart = Int( abs ( LOCAL.result) );
+			LOCAL.resultNumberOfDigits = ( LOCAL.resultIntegerPart EQ 0 ? 1 : Int( Log10( LOCAL.resultIntegerPart ) + 1 ) );
 
-			if( Int( Log10( Int( abs( LOCAL.result ) ) ) + 1 ) + LOCAL.padding lte 15 ){
+			if( LOCAL.resultNumberOfDigits + LOCAL.padding lte 15 ){
 				return LOCAL.result;
 			}else{
 				return NumberFormat( ARGUMENTS.value, LOCAL.roundFormat );
